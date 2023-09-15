@@ -1,10 +1,14 @@
 SERVER_NAME=server
 CLIENT_NAME=client
+
 BIN=bin
-APP_INCLUDES=-I./include
+
+INCLUDES=-I./include
+FLAGS=-Wextra -Wall -std=c99 -g -fsanitize=address
+
 
 server: src/server.c src/err.c 
-	clang $^ -o $(BIN)/$(SERVER_NAME) $(APP_INCLUDES)
+	clang $^ -o $(BIN)/$(SERVER_NAME) $(INCLUDES) $(FLAGS)
 
 client: src/client.c src/err.c
-	clang $^ -o $(BIN)/$(CLIENT_NAME) $(APP_INCLUDES)
+	clang $^ -o $(BIN)/$(CLIENT_NAME) $(INCLUDES) $(FLAGS)
