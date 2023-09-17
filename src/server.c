@@ -1,3 +1,4 @@
+#include "protocol.h"
 #define _POSIX_C_SOURCE 200809L
 #include <stdio.h>
 #include <stdlib.h>
@@ -102,10 +103,17 @@ int open_listener(char *service, int queue_size)
     return sock;
 }
 
+void client_print(char *host, char *service, char *str)
+{
+  printf("[%s:%s] %s\n", host, service, str);
+}
+
 void handle_client(int sock, struct sockaddr *remote_host, socklen_t remote_host_len)
 {
-	char host[100], service[10];
+	char host[100], service[10], *message, *err_msg;
 	int error;
+
+  err_msg = "INTERPRETER NOT IMPLEMENTED";
 
 	error = getnameinfo(remote_host, remote_host_len, host, 100, service, 10, NI_NUMERICSERV);
 	if (error) {
@@ -116,7 +124,13 @@ void handle_client(int sock, struct sockaddr *remote_host, socklen_t remote_host
 
 	printf("Connection from %s:%s\n", host, service);
 
-	write(sock, "hello\n", 7);
+  while (1) {
+    if ((message = recv_message(sock)) == NULL) exit(EXIT_FAILURE); 
+    client_print(host, service, message);
+    free(message);
+
+    if (send_message(sock, err_msg) < 0) exit(EXIT_FAILURE);
+  }
 }
 
 int main(int argc, char **argv)

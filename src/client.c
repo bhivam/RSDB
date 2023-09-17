@@ -7,6 +7,7 @@
 #include <string.h>
 
 #include "err.h"
+#include "protocol.h"
 
 #define BUFLEN 256
 
@@ -53,7 +54,7 @@ int connect_inet(char *host, char *service)
 
 void server_print(char *str, char *host, char *service)
 {
-	printf("[%s:%s] %s", host, service, str);
+	printf("[%s:%s] %s\n", host, service, str);
 }
 
 char *read_line(int fd)
@@ -100,7 +101,7 @@ char *read_line(int fd)
 int main(int argc, char **argv)
 {
 	int sock, bytes;
-	char *host, *service, buf[10], *line;
+	char *host, *service, *line, *message;
 
 
 	if (argc != 3)
@@ -124,22 +125,14 @@ int main(int argc, char **argv)
 			exit(EXIT_FAILURE); 
 		}
 
-		if (strcmp(line, "exit\n") == 0)
-		{
-			//TODO look at this
-			break;
-		}
+		if (strcmp(line, "exit\n") == 0) break;
 		
-		//TODO make this into a loop for saftey
-		bytes = write(sock, line, strlen(line));
-		if (bytes <= 0) exit(EXIT_FAILURE);
+    if (send_message(sock, line) < 0) exit(EXIT_FAILURE);
+    if ((message = recv_message(sock)) == NULL) exit(EXIT_FAILURE);
 
-
-		bytes = read(sock, buf, 7);
-		if (bytes <= 0) exit(EXIT_FAILURE);
-
-		server_print(buf, host, service);
+		server_print(message, host, service);
 		
+    free(message);
 		free(line);
 	}
 
