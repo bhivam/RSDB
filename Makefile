@@ -12,3 +12,6 @@ server: src/server.c src/err.c src/protocol.c
 
 client: src/client.c src/err.c src/protocol.c
 	clang $^ -o $(BIN)/$(CLIENT_NAME) $(INCLUDES) $(FLAGS)
+
+tree_test: src/main.c src/btree.c
+	clang $^ -o $(BIN)/tree_test $(INCLUDES) $(FLAGS)
