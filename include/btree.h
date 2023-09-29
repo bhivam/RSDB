@@ -14,8 +14,10 @@ typedef struct btree_node
 
 typedef struct btree
 {
-  int m; // degree
-  int t; // minimum degree
+  // min_degree = cieling(max_degree / 2) 
+
+  int max_degree; 
+  int min_degree; 
   btree_node *root;
 } btree;
 

@@ -15,8 +15,8 @@ btree *btree_new(int degree)
   btree *tree = malloc(sizeof(btree));
     
   tree->root = NULL;
-  tree->m = degree;
-  tree->t = (int) (degree / 2.0); 
+  tree->max_degree = degree;
+  tree->min_degree = (degree / 2) + 1; 
 
   return tree;
 }
@@ -41,17 +41,50 @@ void btree_add_value(int key, void *value, btree_node *node)
   {
     node->keys = malloc(sizeof(int));
     node->vals = malloc(sizeof(void *));
+    node->keys[node->num_keys] = key;
+    node->vals[node->num_keys] = value;
   }
   else 
   {
     node->keys = realloc(node->keys, sizeof(int) * (node->num_keys + 1));
     node->vals = realloc(node->keys, sizeof(void *) * (node->num_keys + 1));
+  
+    for (int i = 0; i < node->num_keys; i++)
+    {
+      if (key < node->keys[i])
+      {
+        int temp;     
+
+        for (int j = i; i < node->num_keys; j++)
+        {
+          temp = node->keys[j];
+          node->keys[j] = key;
+          key = temp;
+        }
+
+        // also have to do this for value
+
+        break;
+      }
+      else if (key == node->keys[i])
+      {
+        node->vals[i] = value;
+        break;
+      }
+    }
   }
 
-  node->keys[node->num_keys] = key;
-  node->vals[node->num_keys] = value;
-
   node->num_keys++;
+}
+
+int _btree_insert(int key, void *value, btree_node *node, btree *tree)
+{
+  if (node->num_children < tree->max_degree)
+  {
+      
+  }
+
+  return 1;
 }
 
 int btree_insert(int key, void *value, btree *tree)
@@ -62,9 +95,10 @@ int btree_insert(int key, void *value, btree *tree)
     btree_add_value(key, value, tree->root);
     return 1;
   }
-
-  return 1;  
+  
+  return _btree_insert(key, value, tree->root, tree);
 }
+
 
 void *btree_search(int key, btree *tree)
 {
